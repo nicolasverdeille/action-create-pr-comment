@@ -11,7 +11,7 @@ inputs:
     required: true
   pull-request-id:
     description: 'id of the pull request.'
-    default: ${{ github.event.issue.number }}
+    default: ${{ github.event.number }}
     required: true
   text:
     description: 'Comment content'

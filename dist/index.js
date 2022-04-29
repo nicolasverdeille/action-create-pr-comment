@@ -8773,7 +8773,7 @@ async function run() {
       pullRequestId: core.getInput("pull-request-id"),
       text: core.getInput("text"),
     };
-    core.debug(`Inputs: ${inspect(inputs)}`);
+    core.info(`Inputs: ${inspect(inputs)}`);
 
     const octokit = github.getOctokit(inputs.token);
 
