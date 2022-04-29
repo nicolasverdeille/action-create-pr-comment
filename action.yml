@@ -1,13 +1,23 @@
-name: 'Wait'
-description: 'Wait a designated number of milliseconds'
+name: 'Create a comment'
+description: 'Create a pull request comment'
 inputs:
-  milliseconds:  # id of input
-    description: 'number of milliseconds to wait'
+  token:
+    description: 'GITHUB_TOKEN or a repo scoped PAT.'
+    default: ${{ github.token }}
     required: true
-    default: '1000'
+  repository:
+    description: 'name of the repository.'
+    default: ${{ github.repository }}
+    required: true
+  pr-id:
+    description: 'id of the pull request.'
+    required: true
+  text:
+    description: 'Comment content'
+    required: true
 outputs:
-  time: # output will be available to future steps
-    description: 'The current time after waiting'
+  id:
+    description: 'id of the created comment'
 runs:
   using: 'node16'
   main: 'dist/index.js'

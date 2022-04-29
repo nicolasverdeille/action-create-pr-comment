@@ -1,18 +1,31 @@
-const core = require('@actions/core');
-const wait = require('./wait');
-
+const { inspect } = require("util");
+const core = require("@actions/core");
+const github = require("@actions/github");
 
 // most @actions toolkit packages have async methods
 async function run() {
   try {
-    const ms = core.getInput('milliseconds');
-    core.info(`Waiting ${ms} milliseconds ...`);
+    const inputs = {
+      token: core.getInput("token"),
+      owner: core.getInput("repository").split("/")[0],
+      repository: core.getInput("repository").split("/")[1],
+      pullRequestId: core.getInput("pr-id"),
+      text: core.getInput("text"),
+    };
+    core.debug(`Inputs: ${inspect(inputs)}`);
 
-    core.debug((new Date()).toTimeString()); // debug is only output if you set the secret `ACTIONS_RUNNER_DEBUG` to true
-    await wait(parseInt(ms));
-    core.info((new Date()).toTimeString());
+    const octokit = github.getOctokit(inputs.token);
 
-    core.setOutput('time', new Date().toTimeString());
+    const { data: comment } = await octokit.rest.issues.createComment({
+      owner: inputs.owner,
+      repo: inputs.repository,
+      issue_number: inputs.pullRequestId,
+      body: inputs.text,
+    });
+    core.info(
+      `Created comment id '${comment.id}' on pull request '${inputs.pullRequestId}'.`
+    );
+    core.setOutput("comment-id", comment.id);
   } catch (error) {
     core.setFailed(error.message);
   }

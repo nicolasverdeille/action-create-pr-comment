@@ -1555,19 +1555,10 @@ exports.debug = debug; // for test
 
 /***/ }),
 
-/***/ 258:
+/***/ 716:
 /***/ ((module) => {
 
-let wait = function (milliseconds) {
-  return new Promise((resolve) => {
-    if (typeof milliseconds !== 'number') {
-      throw new Error('milliseconds not a number');
-    }
-    setTimeout(() => resolve("done!"), milliseconds)
-  });
-};
-
-module.exports = wait;
+module.exports = eval("require")("@actions/github");
 
 
 /***/ }),
@@ -1693,21 +1684,34 @@ module.exports = require("util");
 var __webpack_exports__ = {};
 // This entry need to be wrapped in an IIFE because it need to be isolated against other modules in the chunk.
 (() => {
+const { inspect } = __nccwpck_require__(669);
 const core = __nccwpck_require__(186);
-const wait = __nccwpck_require__(258);
-
+const github = __nccwpck_require__(716);
 
 // most @actions toolkit packages have async methods
 async function run() {
   try {
-    const ms = core.getInput('milliseconds');
-    core.info(`Waiting ${ms} milliseconds ...`);
+    const inputs = {
+      token: core.getInput("token"),
+      owner: core.getInput("repository").split("/")[0],
+      repository: core.getInput("repository").split("/")[1],
+      pullRequestId: core.getInput("pr-id"),
+      text: core.getInput("text"),
+    };
+    core.debug(`Inputs: ${inspect(inputs)}`);
 
-    core.debug((new Date()).toTimeString()); // debug is only output if you set the secret `ACTIONS_RUNNER_DEBUG` to true
-    await wait(parseInt(ms));
-    core.info((new Date()).toTimeString());
+    const octokit = github.getOctokit(inputs.token);
 
-    core.setOutput('time', new Date().toTimeString());
+    const { data: comment } = await octokit.rest.issues.createComment({
+      owner: inputs.owner,
+      repo: inputs.repository,
+      issue_number: inputs.pullRequestId,
+      body: inputs.text,
+    });
+    core.info(
+      `Created comment id '${comment.id}' on pull request '${inputs.pullRequestId}'.`
+    );
+    core.setOutput("comment-id", comment.id);
   } catch (error) {
     core.setFailed(error.message);
   }
