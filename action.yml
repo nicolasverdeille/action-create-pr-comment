@@ -9,8 +9,9 @@ inputs:
     description: 'name of the repository.'
     default: ${{ github.repository }}
     required: true
-  pr-id:
+  pull-request-id:
     description: 'id of the pull request.'
+    default: ${{ github.event.issue.number }}
     required: true
   text:
     description: 'Comment content'

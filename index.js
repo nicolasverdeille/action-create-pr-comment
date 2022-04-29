@@ -9,7 +9,7 @@ async function run() {
       token: core.getInput("token"),
       owner: core.getInput("repository").split("/")[0],
       repository: core.getInput("repository").split("/")[1],
-      pullRequestId: core.getInput("pr-id"),
+      pullRequestId: core.getInput("pull-request-id"),
       text: core.getInput("text"),
     };
     core.debug(`Inputs: ${inspect(inputs)}`);
