@@ -1,6 +1,8 @@
 const { inspect } = require("util");
 const core = require("@actions/core");
 const github = require("@actions/github");
+const { promises: fs } = require("fs")
+
 
 // most @actions toolkit packages have async methods
 async function run() {
@@ -10,17 +12,19 @@ async function run() {
       owner: core.getInput("repository").split("/")[0],
       repository: core.getInput("repository").split("/")[1],
       pullRequestId: core.getInput("pull-request-id"),
-      text: core.getInput("text"),
+      body: core.getInput("body"),
+      template: core.getInput("template")
     };
-    core.info(`Inputs: ${inspect(inputs)}`);
+    core.debug(`Inputs: ${inspect(inputs)}`);
 
     const octokit = github.getOctokit(inputs.token);
+    const body = inputs.body || await fs.readFile(inputs.template, 'utf8')
 
     const { data: comment } = await octokit.rest.issues.createComment({
       owner: inputs.owner,
       repo: inputs.repository,
       issue_number: inputs.pullRequestId,
-      body: inputs.text,
+      body: body,
     });
     core.info(
       `Created comment id '${comment.id}' on pull request '${inputs.pullRequestId}'.`

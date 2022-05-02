@@ -4,18 +4,16 @@ inputs:
   token:
     description: 'GITHUB_TOKEN or a repo scoped PAT.'
     default: ${{ github.token }}
-    required: true
   repository:
     description: 'name of the repository.'
     default: ${{ github.repository }}
-    required: true
   pull-request-id:
     description: 'id of the pull request.'
     default: ${{ github.event.number }}
-    required: true
-  text:
-    description: 'Comment content'
-    required: true
+  body:
+    description: 'Comment body'
+  template:
+    description: 'Comment template'
 outputs:
   id:
     description: 'id of the created comment'
